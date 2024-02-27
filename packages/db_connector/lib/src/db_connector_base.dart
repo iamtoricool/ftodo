@@ -18,7 +18,7 @@ class FDatabase {
     return PrismaClient(
       stdout: Event.values,
       datasources: Datasources(
-        db: String.fromEnvironment('DATABASE_URL'),
+        db: 'postgres://postgres.ocuxbhvbpokefaihneme:Testpass1214@@!@aws-0-us-west-1.pooler.supabase.com:5432/postgres',
       ),
     );
   }

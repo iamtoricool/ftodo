@@ -25,8 +25,8 @@ Future<Response> _deleteUser(
   String id,
   UsersRepository usersRepository,
 ) async {
-  final _userId = int.parse(id);
-  final _user = await usersRepository.deleteUser(_userId);
+  // final _userId = int.parse(id);
+  // final _user = await usersRepository.deleteUser(_userId);
 
   return crf.basicResponseFormat<String?>(
     statusCode: HttpStatus.noContent,

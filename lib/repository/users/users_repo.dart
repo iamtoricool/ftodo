@@ -1,7 +1,7 @@
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:db_connector/db_connector.dart';
-import 'package:ftodo/core/extensions/extensions.dart';
 
 /// [UsersRepository] provides the methods to handle users
 class UsersRepository {
@@ -12,22 +12,27 @@ class UsersRepository {
   final FDatabase database;
 
   /// [createUser] creates an user and store that in db
-  FutureOr<User?> createUser({
+  FutureOr<String?> createUser({
     required String firstName,
     required String lastName,
     required String email,
     required String password,
     String? phone,
   }) async {
-    return database.db.user.create(
-      data: UserCreateInput(
-        firstName: firstName,
-        lastName: lastName,
-        email: email,
-        password: password.stringToSha256,
-        phone: phone,
-      ),
-    );
+    try {
+      final _user = await database.db.user.create(
+        data: UserCreateInput(
+          firstName: firstName,
+          lastName: lastName,
+          email: email,
+          password: password,
+        ),
+      );
+
+      return jsonEncode(_user.toJson());
+    } on PrismaRequestException catch (e) {
+      return e.code;
+    }
   }
 
   /// [deleteUser] deletes user

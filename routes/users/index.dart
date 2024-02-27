@@ -65,16 +65,18 @@ Future<Response> _createUser(
       );
     }
 
-    final _user = await usersRepository.createUser(
+    final _response = await usersRepository.createUser(
       firstName: _decodedBody['first_name'] as String,
       lastName: _decodedBody['last_name'] as String,
       email: _decodedBody['email'] as String,
       password: _decodedBody['password'] as String,
     );
 
-    return crf.basicResponseFormat<Map<String, dynamic>>(
-      data: _user?.toJson(),
-    );
+    if (_response != null) {
+      return crf.basicResponseFormat(
+        data: _response,
+      );
+    }
   } catch (e) {
     print(e);
   }
