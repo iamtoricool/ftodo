@@ -8,6 +8,20 @@
       "when": 1717351650037,
       "tag": "0000_secret_captain_flint",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1717352833109,
+      "tag": "0001_organic_cerise",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1717352890552,
+      "tag": "0002_parched_whiplash",
+      "breakpoints": true
     }
   ]
 }

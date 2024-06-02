@@ -25,8 +25,8 @@ export const todo = pgTable(
   },
   (table) => {
     return {
-      todoIdx: uniqueIndex("todo_idx").on(table.userId),
-      userIdx: uniqueIndex("user_idx").on(table.userId),
+      todoIdx: uniqueIndex("todo_idx").on(table.id),
+      userIdx: index("user_idx").on(table.userId),
       titleIdx: index("title_idx").on(table.title),
     };
   }
