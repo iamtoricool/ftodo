@@ -5,15 +5,8 @@
     {
       "idx": 0,
       "version": "7",
-      "when": 1717347483052,
-      "tag": "0000_created_todos_table",
-      "breakpoints": true
-    },
-    {
-      "idx": 1,
-      "version": "7",
-      "when": 1717349635809,
-      "tag": "0001_isCompleted_renamed_is_completed",
+      "when": 1717351650037,
+      "tag": "0000_secret_captain_flint",
       "breakpoints": true
     }
   ]

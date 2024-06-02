@@ -1,13 +1,33 @@
-import { pgTable, uuid, varchar, text, boolean } from "drizzle-orm/pg-core";
+import {
+  pgTable,
+  varchar,
+  text,
+  boolean,
+  serial,
+  uuid,
+  index,
+  uniqueIndex,
+} from "drizzle-orm/pg-core";
 
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 import { z } from "zod";
 
-export const todo = pgTable("todos", {
-  id: uuid("id").primaryKey().defaultRandom().unique(),
-  title: varchar("title", { length: 255 }).notNull(),
-  description: text("description"),
-  isCompleted: boolean("is_completed").default(false),
-});
+import { user } from "./user_schema";
 
-const createTodoSchema = createInsertSchema(todo);
+export const todo = pgTable(
+  "todos",
+  {
+    id: serial("id").primaryKey(),
+    userId: uuid("user_id").references(() => user.id),
+    title: varchar("title", { length: 255 }).notNull(),
+    description: text("description"),
+    isCompleted: boolean("is_completed").default(false),
+  },
+  (table) => {
+    return {
+      todoIdx: uniqueIndex("todo_idx").on(table.userId),
+      userIdx: uniqueIndex("user_idx").on(table.userId),
+      titleIdx: index("title_idx").on(table.title),
+    };
+  }
+);
