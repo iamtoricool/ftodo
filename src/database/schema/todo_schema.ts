@@ -31,3 +31,8 @@ export const todo = pgTable(
     };
   }
 );
+
+export const todoReqSchema = createInsertSchema(todo).omit({
+  id: true,
+  userId: true,
+});

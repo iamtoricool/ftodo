@@ -1,51 +1,30 @@
 import { Hono } from "hono";
-import { todoReqSchema, type Todo } from "./todo_schema";
+import {
+  todo as todoTable,
+  todo,
+  todoReqSchema,
+  type Todo,
+} from "../../database/schema/zod_schema";
+
 import { responseWithData } from "../../utils/base_http_response";
 import { zValidator } from "@hono/zod-validator";
+import { dbClient } from "../../database/database";
 
 export const todoRoute = new Hono();
 
-const todos: Todo[] = [
-  {
-    id: 1,
-    title: "Learn Zod validation",
-    description: "Explore Zod features and how to use them for data validation",
-    isComplete: false,
-  },
-  {
-    id: 2,
-    title: "Build a basic API with Hono",
-    description:
-      "Set up a simple Hono server and create endpoints for CRUD operations",
-    isComplete: true,
-  },
-  {
-    id: 3,
-    title: "Write unit tests for the API",
-    description: "Ensure code functionality and handle potential edge cases",
-    isComplete: false,
-  },
-  {
-    id: 4,
-    title: "Deploy the API to a cloud platform",
-    description: "Choose a platform like Vercel or Netlify for hosting",
-    isComplete: false,
-  },
-  {
-    id: 5,
-    title: "Celebrate your progress!",
-    description: "Take a break and acknowledge your achievements",
-    isComplete: false,
-  },
-];
-
 todoRoute.get("/", async (ctx) => {
+  const todos = await dbClient.query.todo.findMany({
+    columns: { userId: false },
+  });
   return ctx.json(responseWithData<Todo[]>({ data: todos }));
 });
 
 todoRoute.get("/:id{[0-9]+}", async (ctx) => {
   const id = Number.parseInt(ctx.req.param()["id"]);
-  const todo = todos.find((todo) => todo.id === id);
+  const todo = await dbClient.query.todo.findFirst({
+    columns: { userId: false },
+    where: (field, operator) => operator.eq(field.id, id),
+  });
 
   if (!todo) {
     return ctx.json(
@@ -62,16 +41,22 @@ todoRoute.get("/:id{[0-9]+}", async (ctx) => {
 });
 
 todoRoute.post("/", zValidator("json", todoReqSchema), async (ctx) => {
-  const todo = ctx.req.valid("json");
-  const newId = todos.length + 1;
-  todos.push({ id: newId, ...todo });
+  const reqData = ctx.req.valid("json");
 
-  return ctx.json(
-    responseWithData<Todo>({ data: { id: newId, ...todo } }),
-    201
-  );
+  const todo = await dbClient
+    .insert(todoTable)
+    .values({ ...reqData, userId: "90f91b4a-63dc-49ee-9118-3191bbc59271" })
+    .returning();
+
+  return ctx.json(responseWithData<typeof todo>({ data: todo }), 201);
+
+  // return ctx.json(
+  //   responseWithData<Todo>({ data: { id: newId, ...todo } }),
+  //   201
+  // );
 });
 
+/*
 todoRoute.put(
   "/:id{[0-9]+}",
   zValidator("json", todoReqSchema),
@@ -115,3 +100,4 @@ todoRoute.delete("/:id{[0-9]+}", async (ctx) => {
 
   return ctx.json(responseWithData<Todo | null>({ data: removedTodo }));
 });
+*/
