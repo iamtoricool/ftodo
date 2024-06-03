@@ -1,13 +1,18 @@
 import { Hono } from "hono";
 import { logger } from "hono/logger";
-import { todoRoute } from "./src/routes/todo/todo_route";
+import { trimTrailingSlash } from "hono/trailing-slash";
+
 import { testMiddleware } from "./src/middlewares/test_middleware";
+
+import { todoRoute } from "./src/routes/todo/todo_route";
 import { userRoute } from "./src/routes/user/user_route";
 
 const app = new Hono();
 
 // Middlewares
+app.use(trimTrailingSlash());
 app.use(logger());
+
 app.use("/api/*", testMiddleware);
 
 // Routes

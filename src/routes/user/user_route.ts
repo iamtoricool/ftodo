@@ -1,6 +1,5 @@
 import { Hono } from "hono";
 import { dbClient } from "../../database/database";
-import { eq, lt, gte, ne } from "drizzle-orm";
 
 import { responseWithData } from "../../utils/base_http_response";
 
@@ -11,22 +10,26 @@ export const userRoute = new Hono();
 userRoute.get("/", async (ctx) => {
   const users = await dbClient.query.user.findMany();
 
-  return ctx.json(responseWithData<any>({ data: users }));
+  const statusCode = users.length <= 0 ? 204 : 200;
+
+  return ctx.json(responseWithData<typeof users>({ data: users }), statusCode);
 });
 
 userRoute.get(`/:id`, async (ctx) => {
   const userId = ctx.req.param()["id"];
 
-  let user;
-  try {
-    user = await dbClient.select().from(schema.user);
-  } catch (error) {
-    console.error(error);
+  const user = await dbClient.query.user.findFirst({
+    where: (field, operator) => operator.eq(field.id, userId),
+  });
 
+  if (!user) {
     return ctx.json(
-      responseWithData<typeof error>({
-        data: error,
-      })
+      responseWithData<null>({
+        error: true,
+        message: `No user found with the id: ${userId}`,
+        data: null,
+      }),
+      404
     );
   }
 
