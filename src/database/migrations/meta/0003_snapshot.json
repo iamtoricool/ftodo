@@ -1,5 +1,5 @@
 {
-  "id": "1bb7359e-574a-4482-a287-40c559b73cbc",
+  "id": "bd59a283-6db8-44c2-bf98-43a737d1d9dc",
   "prevId": "76ec6be3-ea27-472e-9330-3e117bf11e83",
   "version": "7",
   "dialect": "postgresql",
@@ -14,6 +14,12 @@
           "primaryKey": false,
           "notNull": true
         },
+        "email": {
+          "name": "email",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": true
+        },
         "passkey": {
           "name": "passkey",
           "type": "text",
@@ -21,7 +27,53 @@
           "notNull": true
         }
       },
-      "indexes": {},
+      "indexes": {
+        "auth_idx": {
+          "name": "auth_idx",
+          "columns": [
+            {
+              "expression": "user_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": true,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "auth_email": {
+          "name": "auth_email",
+          "columns": [
+            {
+              "expression": "email",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": true,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "passkey": {
+          "name": "passkey",
+          "columns": [
+            {
+              "expression": "passkey",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
       "foreignKeys": {
         "auth_users_user_id_users_id_fk": {
           "name": "auth_users_user_id_users_id_fk",
@@ -35,10 +87,38 @@
           ],
           "onDelete": "no action",
           "onUpdate": "no action"
+        },
+        "auth_users_email_users_email_fk": {
+          "name": "auth_users_email_users_email_fk",
+          "tableFrom": "auth_users",
+          "tableTo": "users",
+          "columnsFrom": [
+            "email"
+          ],
+          "columnsTo": [
+            "email"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
         }
       },
       "compositePrimaryKeys": {},
-      "uniqueConstraints": {}
+      "uniqueConstraints": {
+        "auth_users_user_id_unique": {
+          "name": "auth_users_user_id_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "user_id"
+          ]
+        },
+        "auth_users_email_unique": {
+          "name": "auth_users_email_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "email"
+          ]
+        }
+      }
     },
     "public.todos": {
       "name": "todos",
