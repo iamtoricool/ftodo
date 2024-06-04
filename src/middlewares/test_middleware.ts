@@ -1,7 +1,7 @@
-import type { Context } from "hono";
+import type { Context, Next } from "hono";
 import { responseWithData } from "../utils/base_http_response";
 
-export async function testMiddleware(ctx: Context, next: Function) {
+export async function testMiddleware(ctx: Context, next: Next) {
   const token = ctx.req.header()["authorization"];
 
   if (!token) {
