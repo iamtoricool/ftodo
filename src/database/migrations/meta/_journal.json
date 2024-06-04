@@ -29,6 +29,13 @@
       "when": 1717523068985,
       "tag": "0003_created_auth_users_table",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1717524792690,
+      "tag": "0004_added_auth_user_indexing",
+      "breakpoints": true
     }
   ]
 }
