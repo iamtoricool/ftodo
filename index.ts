@@ -8,7 +8,7 @@ import { todoRoute } from "./src/routes/todo/todo_route";
 import { userRoute } from "./src/routes/user/user_route";
 import { authRoute } from "./src/routes/auth/auth_route";
 
-const app = new Hono();
+const app = new Hono().basePath('/api');
 
 app.use(trimTrailingSlash());
 app.use(logger());
@@ -16,12 +16,12 @@ app.use(logger());
 
 
 // Auth Route
-app.route("/api/auth", authRoute);
+app.route("/auth", authRoute);
 
 // Auth Protected Routes
-app.use("/api/*", testMiddleware);
-app.route("/api/todos", todoRoute);
-app.route("/api/users", userRoute);
+app.use("/*", testMiddleware);
+app.route("/todos", todoRoute);
+app.route("/users", userRoute);
 
 // HTTP Server
 const server = Bun.serve({ fetch: app.fetch });
