@@ -7,12 +7,16 @@ import {
   uniqueIndex,
 } from "drizzle-orm/pg-core";
 
+import { createInsertSchema, createSelectSchema } from "drizzle-zod";
+import { z } from "zod";
+
 export const userMembershipEnum = pgEnum("membership", [
   "FREE",
   "BRONZE",
   "SILVER",
   "GOLD",
 ]);
+
 export const user = pgTable(
   "users",
   {
@@ -31,3 +35,20 @@ export const user = pgTable(
     };
   }
 );
+
+export const userInsertSchema = createInsertSchema(user, {
+  firstName: (schema) =>
+    schema.firstName
+      .trim()
+      .min(1, { message: `firstName is required` })
+      .max(255),
+
+
+  email: (schema) => schema.email.trim().email({ message: `invalid email format` }),
+})
+  .extend({
+    password: z
+      .string()
+      .min(6, { message: "Password must be at least 6 characters" }),
+  })
+  .strict();
