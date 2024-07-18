@@ -1,25 +1,27 @@
 import { Hono } from "hono";
 import { logger } from "hono/logger";
 import { trimTrailingSlash } from "hono/trailing-slash";
+import { jwt } from "hono/jwt";
+import type { JwtVariables } from "hono/jwt";
 
-import { testMiddleware } from "./src/middlewares/test_middleware";
+import { authMiddleware } from "./src/middlewares/auth_middleware";
 
 import { todoRoute } from "./src/routes/todo/todo_route";
 import { userRoute } from "./src/routes/user/user_route";
 import { authRoute } from "./src/routes/auth/auth_route";
 
-const app = new Hono().basePath('/api');
+type Variables = JwtVariables;
+
+const app = new Hono<{ Variables: Variables }>().basePath("/api");
 
 app.use(trimTrailingSlash());
 app.use(logger());
-
-
 
 // Auth Route
 app.route("/auth", authRoute);
 
 // Auth Protected Routes
-app.use("/*", testMiddleware);
+app.use("/*", authMiddleware);
 app.route("/todos", todoRoute);
 app.route("/users", userRoute);
 
