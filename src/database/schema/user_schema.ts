@@ -42,9 +42,11 @@ export const userInsertSchema = createInsertSchema(user, {
       .trim()
       .min(1, { message: `firstName is required` })
       .max(255),
-
-
-  email: (schema) => schema.email.trim().email({ message: `invalid email format` }),
+  email: (schema) =>
+    schema.email
+      .trim()
+      .toLowerCase()
+      .email({ message: `invalid email format` }),
 })
   .extend({
     password: z
