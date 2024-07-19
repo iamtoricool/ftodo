@@ -43,6 +43,13 @@
       "when": 1721401618315,
       "tag": "0005_free_ben_urich",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1721403947059,
+      "tag": "0006_updated_for_user_profile_update",
+      "breakpoints": true
     }
   ]
 }

@@ -1,7 +1,12 @@
 import { z } from "zod";
 
 import { todo, todoReqSchema } from "./todo_schema";
-import { user, userInsertSchema, userSelectSchema } from "./user_schema";
+import {
+  user,
+  userInsertSchema,
+  userSelectSchema,
+  userUpdateSchema,
+} from "./user_schema";
 import { authUser, authInsertSchema } from "./auth_schema";
 
 type Todo = z.infer<typeof todoReqSchema>;
@@ -17,6 +22,7 @@ export {
   todoReqSchema,
   user,
   userInsertSchema,
+  userUpdateSchema,
   userSelectSchema,
   authUser,
   signInSchema,

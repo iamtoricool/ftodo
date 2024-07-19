@@ -59,3 +59,4 @@ export const userInsertSchema = createInsertSchema(user, {
       .min(6, { message: "Password must be at least 6 characters" }),
   })
   .strict();
+export const userUpdateSchema = userInsertSchema.omit({ password: true });

@@ -18,7 +18,10 @@ export const authUser = pgTable(
       .notNull()
       .unique(),
     email: varchar("email")
-      .references(() => user.email, { onDelete: "cascade" })
+      .references(() => user.email, {
+        onDelete: "cascade",
+        onUpdate: "cascade",
+      })
       .notNull()
       .unique(),
     passKey: text("passkey").notNull(),
