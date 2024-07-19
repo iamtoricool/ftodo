@@ -50,6 +50,13 @@
       "when": 1721403947059,
       "tag": "0006_updated_for_user_profile_update",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1721404479854,
+      "tag": "0007_changed_date_to_timestamp",
+      "breakpoints": true
     }
   ]
 }

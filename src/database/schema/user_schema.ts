@@ -5,7 +5,7 @@ import {
   pgEnum,
   index,
   uniqueIndex,
-  date,
+  timestamp,
 } from "drizzle-orm/pg-core";
 
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
@@ -26,8 +26,8 @@ export const user = pgTable(
     lastName: varchar("last_name", { length: 255 }).notNull(),
     email: varchar("email", { length: 255 }).notNull().unique(),
     membership: userMembershipEnum("membership").default("FREE"),
-    createdAt: date("created_at").defaultNow(),
-    updatedAt: date("updated_at").defaultNow(),
+    createdAt: timestamp("created_at").defaultNow(),
+    updatedAt: timestamp("updated_at").defaultNow(),
   },
   (table) => {
     return {
@@ -59,4 +59,5 @@ export const userInsertSchema = createInsertSchema(user, {
       .min(6, { message: "Password must be at least 6 characters" }),
   })
   .strict();
+
 export const userUpdateSchema = userInsertSchema.omit({ password: true });
