@@ -115,7 +115,7 @@ authRoute.post("/signin", zValidator("json", signInSchema), async (ctx) => {
   }
 
   const expiresAt = Math.floor(Date.now() / 1000) + 30 * 24 * 60 * 60;
-  const tokenPayload = { ...result, exp: expiresAt };
+  const tokenPayload = { ...result.users, exp: expiresAt };
 
   const jwtToken = await sign(
     tokenPayload,

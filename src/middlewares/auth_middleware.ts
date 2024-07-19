@@ -60,11 +60,11 @@ export async function authMiddleware(ctx: Context, next: Next) {
       "HS512"
     );
 
-    const { data, error } = await userSelectSchema.safeParseAsync(
-      decodedToken["users"]
-    );
+    const { data, error } = await userSelectSchema.safeParseAsync(decodedToken);
 
     if (error) {
+      console.log("Error occured", error);
+
       return ctx.json(
         responseWithData<null>({
           error: true,
