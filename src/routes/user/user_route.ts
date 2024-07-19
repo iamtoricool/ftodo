@@ -1,37 +1,56 @@
 import { Hono } from "hono";
+import { zValidator } from "@hono/zod-validator";
+
+import { eq } from "drizzle-orm";
+import postgres from "postgres";
+
+import {
+  userUpdateSchema,
+  user as userTable,
+  type User,
+} from "../../database/schema/zod_schema";
 import { dbClient } from "../../database/database";
-
 import { responseWithData } from "../../utils/base_http_response";
-
-import * as schema from "../../database/schema/schema";
+import { z } from "zod";
+import { dbDateFormat } from "../../helpers/helpers";
 
 export const userRoute = new Hono();
 
 userRoute.get("/", async (ctx) => {
-  const users = await dbClient.query.user.findMany();
-
-  const statusCode = users.length <= 0 ? 204 : 200;
-
-  return ctx.json(responseWithData<typeof users>({ data: users }), statusCode);
+  const user: User = ctx.get("jwtPayload");
+  return ctx.json(responseWithData<User>({ data: user }));
 });
 
-userRoute.get(`/:id`, async (ctx) => {
-  const userId = ctx.req.param()["id"];
+userRoute.put("/", zValidator("json", userUpdateSchema), async (ctx) => {
+  let userId = ctx.get("jwtPayload")["id"];
+  const requestedData = ctx.req.valid("json");
 
-  const user = await dbClient.query.user.findFirst({
-    where: (field, operator) => operator.eq(field.id, userId),
-  });
+  try {
+    const user = await dbClient
+      .update(userTable)
+      .set({
+        firstName: requestedData.firstName,
+        lastName: requestedData.lastName,
+        email: requestedData.email,
+        updatedAt: dbDateFormat(Date.now()),
+      })
+      .where(eq(userTable.id, userId))
+      .returning();
 
-  if (!user) {
+    return ctx.json(responseWithData<typeof user>({ data: user }));
+  } catch (error) {
+    let errMessage: string | undefined;
+    if (error instanceof postgres.PostgresError) {
+      errMessage = error.detail ?? error.hint;
+    }
+
     return ctx.json(
-      responseWithData<null>({
+      responseWithData<typeof error>({
         error: true,
-        message: `No user found with the id: ${userId}`,
-        data: null,
+        message: errMessage,
+        data: error,
       }),
-      404
+      400
     );
   }
-
-  return ctx.json(responseWithData<typeof user>({ data: user }));
 });

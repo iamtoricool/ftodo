@@ -81,7 +81,7 @@ export async function authMiddleware(ctx: Context, next: Next) {
       );
     }
     const foundUser = (await dbClient.select().from(authTable)).find(
-      (authUser) => authUser.userId === data.id && authUser.email === data.email
+      (authUser) => authUser.userId === data.id
     );
     if (!foundUser) {
       return ctx.json(
