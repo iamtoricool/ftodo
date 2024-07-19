@@ -10,7 +10,12 @@ import {
   JwtTokenSignatureMismatched,
   JwtTokenInvalid,
 } from "hono/utils/jwt/types";
-import { userSelectSchema, type User } from "../database/schema/zod_schema";
+import {
+  authUser as authTable,
+  userSelectSchema,
+  type User,
+} from "../database/schema/zod_schema";
+import { dbClient } from "../database/database";
 
 export async function authMiddleware(ctx: Context, next: Next) {
   let reqToken: string[] = [];
@@ -70,6 +75,20 @@ export async function authMiddleware(ctx: Context, next: Next) {
           error: true,
           message:
             "Something went wrong decoding the provided token. please check request token and try again later",
+          data: null,
+        }),
+        400
+      );
+    }
+    const foundUser = (await dbClient.select().from(authTable)).find(
+      (authUser) => authUser.userId === data.id && authUser.email === data.email
+    );
+    if (!foundUser) {
+      return ctx.json(
+        responseWithData<null>({
+          error: true,
+          message:
+            "Token verified successfully, but user not authorized. Please try logging in and try again.",
           data: null,
         }),
         400
