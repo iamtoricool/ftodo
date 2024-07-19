@@ -36,6 +36,8 @@ export const user = pgTable(
   }
 );
 
+export const userSelectSchema = createSelectSchema(user);
+
 export const userInsertSchema = createInsertSchema(user, {
   firstName: (schema) =>
     schema.firstName

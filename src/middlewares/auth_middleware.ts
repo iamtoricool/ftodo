@@ -10,7 +10,7 @@ import {
   JwtTokenSignatureMismatched,
   JwtTokenInvalid,
 } from "hono/utils/jwt/types";
-import { userInsertSchema } from "../database/schema/zod_schema";
+import { userSelectSchema, type User } from "../database/schema/zod_schema";
 
 export async function authMiddleware(ctx: Context, next: Next) {
   let reqToken: string[] = [];
@@ -59,8 +59,25 @@ export async function authMiddleware(ctx: Context, next: Next) {
       process.env.JWT_SECRET as string,
       "HS512"
     );
-    const { data, error } = userInsertSchema.safeParse(decodedToken["user"]);
-    console.log(decodedToken);
+
+    const { data, error } = await userSelectSchema.safeParseAsync(
+      decodedToken["users"]
+    );
+
+    if (error) {
+      return ctx.json(
+        responseWithData<null>({
+          error: true,
+          message:
+            "Something went wrong decoding the provided token. please check request token and try again later",
+          data: null,
+        }),
+        400
+      );
+    }
+
+    ctx.set("jwtPayload", data);
+    await next();
   } catch (error) {
     const errorTypes = [
       JwtTokenNotBefore,
@@ -117,6 +134,4 @@ export async function authMiddleware(ctx: Context, next: Next) {
       401
     );
   }
-
-  await next();
 }

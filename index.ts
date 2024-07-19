@@ -10,9 +10,7 @@ import { todoRoute } from "./src/routes/todo/todo_route";
 import { userRoute } from "./src/routes/user/user_route";
 import { authRoute } from "./src/routes/auth/auth_route";
 
-type Variables = JwtVariables;
-
-const app = new Hono<{ Variables: Variables }>().basePath("/api");
+const app = new Hono<{ Variables: JwtVariables }>().basePath("/api");
 
 app.use(trimTrailingSlash());
 app.use(logger());
@@ -23,7 +21,7 @@ app.route("/auth", authRoute);
 // Auth Protected Routes
 app.use("/*", authMiddleware);
 app.route("/todos", todoRoute);
-app.route("/users", userRoute);
+app.route("/user", userRoute);
 
 // HTTP Server
 const server = Bun.serve({ fetch: app.fetch });
