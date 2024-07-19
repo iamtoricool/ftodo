@@ -5,6 +5,7 @@ import {
   pgEnum,
   index,
   uniqueIndex,
+  date,
 } from "drizzle-orm/pg-core";
 
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
@@ -25,6 +26,8 @@ export const user = pgTable(
     lastName: varchar("last_name", { length: 255 }).notNull(),
     email: varchar("email", { length: 255 }).notNull().unique(),
     membership: userMembershipEnum("membership").default("FREE"),
+    createdAt: date("created_at").defaultNow(),
+    updatedAt: date("updated_at").defaultNow(),
   },
   (table) => {
     return {
