@@ -7,6 +7,7 @@ import {
   uuid,
   index,
   uniqueIndex,
+  timestamp,
 } from "drizzle-orm/pg-core";
 
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
@@ -21,6 +22,8 @@ export const todo = pgTable(
     title: varchar("title", { length: 255 }).notNull(),
     description: text("description"),
     isCompleted: boolean("is_completed").default(false),
+    createdAt: timestamp("created_at", { mode: "string" }).defaultNow(),
+    updatedAt: timestamp("updated_at", { mode: "string" }).defaultNow(),
   },
   (table) => {
     return {
@@ -31,7 +34,11 @@ export const todo = pgTable(
   }
 );
 
-export const todoInsertSchema = createInsertSchema(todo).omit({
-  id: true,
-  userId: true,
-});
+export const todosSelectSchema = createSelectSchema(todo);
+
+export const todoInsertSchema = createInsertSchema(todo)
+  .omit({
+    id: true,
+    userId: true,
+  })
+  .strict();

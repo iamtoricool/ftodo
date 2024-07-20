@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-import { todo, todoInsertSchema } from "./todo_schema";
+import { todo, todoInsertSchema, todosSelectSchema } from "./todo_schema";
 import {
   user,
   userInsertSchema,
@@ -19,7 +19,8 @@ const signInSchema = userInsertSchema
 
 export {
   todo,
-  todoInsertSchema as todoReqSchema,
+  todoInsertSchema,
+  todosSelectSchema,
   user,
   userInsertSchema,
   userUpdateSchema,

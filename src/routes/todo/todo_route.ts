@@ -1,29 +1,44 @@
 import { Hono } from "hono";
+import { zValidator } from "@hono/zod-validator";
+
 import {
   todo as todoTable,
-  todo,
-  todoReqSchema,
+  todoInsertSchema,
   type Todo,
 } from "../../database/schema/zod_schema";
 
 import { responseWithData } from "../../utils/base_http_response";
-import { zValidator } from "@hono/zod-validator";
 import { dbClient } from "../../database/database";
+import { multiDeleteSchema } from "./_zod_shema";
+import { and, eq } from "drizzle-orm";
+import { dbDateFormat } from "../../helpers/helpers";
 
 export const todoRoute = new Hono();
 
 todoRoute.get("/", async (ctx) => {
+  let userId = ctx.get("jwtPayload")["id"];
+
   const todos = await dbClient.query.todo.findMany({
     columns: { userId: false },
+    where: (fields, operator) => {
+      return operator.and(operator.eq(fields.userId, userId));
+    },
+    orderBy: (fields, operators) => operators.asc(fields.isCompleted),
   });
   return ctx.json(responseWithData<Todo[]>({ data: todos }));
 });
 
 todoRoute.get("/:id{[0-9]+}", async (ctx) => {
+  let userId = ctx.get("jwtPayload")["id"];
   const id = Number.parseInt(ctx.req.param()["id"]);
+
   const todo = await dbClient.query.todo.findFirst({
     columns: { userId: false },
-    where: (field, operator) => operator.eq(field.id, id),
+    where: (field, operator) =>
+      operator.and(
+        operator.eq(field.userId, userId),
+        operator.eq(field.id, id)
+      ),
   });
 
   if (!todo) {
@@ -40,64 +55,65 @@ todoRoute.get("/:id{[0-9]+}", async (ctx) => {
   return ctx.json(responseWithData<Todo>({ data: todo }));
 });
 
-todoRoute.post("/", zValidator("json", todoReqSchema), async (ctx) => {
+todoRoute.post("/", zValidator("json", todoInsertSchema), async (ctx) => {
+  const userId = ctx.get("jwtPayload")["id"];
   const reqData = ctx.req.valid("json");
 
-  const todo = await dbClient
-    .insert(todoTable)
-    .values({ ...reqData, userId: "90f91b4a-63dc-49ee-9118-3191bbc59271" })
-    .returning();
+  const todo = (
+    await dbClient
+      .insert(todoTable)
+      .values({ userId: userId, ...reqData })
+      .returning()
+  )[0];
 
   return ctx.json(responseWithData<typeof todo>({ data: todo }), 201);
-
-  // return ctx.json(
-  //   responseWithData<Todo>({ data: { id: newId, ...todo } }),
-  //   201
-  // );
 });
 
-/*
 todoRoute.put(
   "/:id{[0-9]+}",
-  zValidator("json", todoReqSchema),
+  zValidator("json", todoInsertSchema),
   async (ctx) => {
-    const id = Number.parseInt(ctx.req.param()["id"]);
-    let todoIndex = todos.findIndex((todo) => todo.id === id);
+    const userId = ctx.get("jwtPayload")["id"];
+    const todoId = Number.parseInt(ctx.req.param("id"));
+    const reqData = ctx.req.valid("json");
 
-    if (!todoIndex) {
+    let todo = await dbClient.query.todo.findFirst({
+      where: (fields, operators) =>
+        operators.and(
+          operators.eq(fields.id, todoId),
+          operators.eq(fields.userId, userId)
+        ),
+    });
+
+    if (!todo) {
       return ctx.json(
         responseWithData<null>({
           error: true,
-          message: `No todo found with id ${id}`,
+          message: `No todo found within id: ${todoId}`,
           data: null,
         }),
-        404
+        204
       );
     }
-    const updatedTodo = { id: id, ...ctx.req.valid("json") };
-    todos[todoIndex] = updatedTodo;
-    return ctx.json(responseWithData<Todo>({ data: updatedTodo }));
+
+    todo = (
+      await dbClient
+        .update(todoTable)
+        .set({ ...reqData, updatedAt: dbDateFormat(Date.now()) })
+
+        .where(and(eq(todoTable.userId, userId), eq(todoTable.id, todoId)))
+        .returning()
+    )[0];
+
+    return ctx.json(
+      responseWithData<typeof todo>({
+        message: "Updated successfully",
+        data: todo,
+      })
+    );
   }
 );
 
-todoRoute.delete("/:id{[0-9]+}", async (ctx) => {
-  const id = Number.parseInt(ctx.req.param()["id"]);
-
-  const todoIndex = todos.findIndex((todo) => todo.id === id);
-
-  if (todoIndex === -1) {
-    return ctx.json(
-      responseWithData<null>({
-        error: true,
-        message: `No todo found with id ${id}`,
-        data: null,
-      }),
-      404
-    );
-  }
-
-  const [removedTodo] = todos.splice(todoIndex, 1);
-
-  return ctx.json(responseWithData<Todo | null>({ data: removedTodo }));
+todoRoute.delete("/", zValidator("json", multiDeleteSchema), async (ctx) => {
+  return ctx.json(responseWithData<null>({ data: null }));
 });
-*/
