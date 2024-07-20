@@ -18,7 +18,7 @@ export const todo = pgTable(
   "todos",
   {
     id: serial("id").primaryKey(),
-    userId: uuid("user_id").references(() => user.id, { onDelete: "cascade" }),
+    userId: uuid("user_id").references(() => user.id, { onDelete: "cascade" }).notNull(),
     title: varchar("title", { length: 255 }).notNull(),
     description: text("description"),
     isCompleted: boolean("is_completed").default(false),
