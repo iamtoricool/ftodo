@@ -80,9 +80,9 @@ export async function authMiddleware(ctx: Context, next: Next) {
         400
       );
     }
-    const foundUser = (await dbClient.select().from(authTable)).find(
-      (authUser) => authUser.userId === data.id
-    );
+    const foundUser = await dbClient.query.authUser.findFirst({
+      where: (fields, operators) => operators.eq(fields.userId, data.id),
+    });
     if (!foundUser) {
       return ctx.json(
         responseWithData<null>({
