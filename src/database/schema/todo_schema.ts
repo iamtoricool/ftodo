@@ -10,7 +10,6 @@ import {
 } from "drizzle-orm/pg-core";
 
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
-import { z } from "zod";
 
 import { user } from "./user_schema";
 
@@ -18,7 +17,7 @@ export const todo = pgTable(
   "todos",
   {
     id: serial("id").primaryKey(),
-    userId: uuid("user_id").references(() => user.id),
+    userId: uuid("user_id").references(() => user.id, { onDelete: "cascade" }),
     title: varchar("title", { length: 255 }).notNull(),
     description: text("description"),
     isCompleted: boolean("is_completed").default(false),
@@ -32,7 +31,7 @@ export const todo = pgTable(
   }
 );
 
-export const todoReqSchema = createInsertSchema(todo).omit({
+export const todoInsertSchema = createInsertSchema(todo).omit({
   id: true,
   userId: true,
 });

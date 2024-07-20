@@ -1,1 +1,69 @@
-{"version":"7","dialect":"postgresql","entries":[{"idx":0,"version":"7","when":1717351650037,"tag":"0000_secret_captain_flint","breakpoints":true},{"idx":1,"version":"7","when":1717352833109,"tag":"0001_organic_cerise","breakpoints":true},{"idx":2,"version":"7","when":1717352890552,"tag":"0002_parched_whiplash","breakpoints":true},{"idx":3,"version":"7","when":1717526025811,"tag":"0003_added_auth_users_table_with_indexing","breakpoints":true},{"idx":4,"version":"7","when":1721323605817,"tag":"0004_demonic_the_spike","breakpoints":true},{"idx":5,"version":"7","when":1721401618315,"tag":"0005_free_ben_urich","breakpoints":true},{"idx":6,"version":"7","when":1721403947059,"tag":"0006_updated_for_user_profile_update","breakpoints":true},{"idx":7,"version":"7","when":1721404479854,"tag":"0007_changed_date_to_timestamp","breakpoints":true}]}
+{
+  "version": "7",
+  "dialect": "postgresql",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "7",
+      "when": 1717351650037,
+      "tag": "0000_secret_captain_flint",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1717352833109,
+      "tag": "0001_organic_cerise",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1717352890552,
+      "tag": "0002_parched_whiplash",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1717526025811,
+      "tag": "0003_added_auth_users_table_with_indexing",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1721323605817,
+      "tag": "0004_demonic_the_spike",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1721401618315,
+      "tag": "0005_free_ben_urich",
+      "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1721403947059,
+      "tag": "0006_updated_for_user_profile_update",
+      "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1721404479854,
+      "tag": "0007_changed_date_to_timestamp",
+      "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1721444779253,
+      "tag": "0008_narrow_union_jack",
+      "breakpoints": true
+    }
+  ]
+}
