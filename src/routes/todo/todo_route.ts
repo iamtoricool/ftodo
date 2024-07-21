@@ -23,7 +23,11 @@ todoRoute.get("/", async (ctx) => {
     where: (fields, operator) => {
       return operator.and(operator.eq(fields.userId, userId));
     },
-    orderBy: (fields, operators) => operators.asc(fields.isCompleted),
+    orderBy: (fields, operators) => {
+      return (
+        operators.asc(fields.isCompleted) && operators.desc(fields.updatedAt)
+      );
+    },
   });
   return ctx.json(responseWithData<Todo[]>({ data: todos }));
 });
