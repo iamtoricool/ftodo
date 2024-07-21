@@ -114,8 +114,8 @@ authRoute.post("/signin", zValidator("json", signInSchema), async (ctx) => {
     );
   }
 
-  const expiresAt = Math.floor(Date.now() / 1000) + 30 * 24 * 60 * 60;
-  const tokenPayload = { ...result.users, exp: expiresAt };
+  const expireDate = Math.floor(Date.now() / 1000) + 60; //30 * 24 * 60 * 60;
+  const tokenPayload = { ...result.users, exp: expireDate };
 
   const jwtToken = await sign(
     tokenPayload,
@@ -123,10 +123,11 @@ authRoute.post("/signin", zValidator("json", signInSchema), async (ctx) => {
     "HS512"
   );
 
+  const expiresAt = formatDate(expireDate);
   const sanitizedData = {
     ...result.users,
     token: jwtToken,
-    expiresAt: formatDate(expiresAt),
+    expiresAt: expiresAt,
   };
 
   return ctx.json(
@@ -142,6 +143,7 @@ function formatDate(timestamp: number) {
   const hours = String(date.getHours()).padStart(2, "0");
   const minutes = String(date.getMinutes()).padStart(2, "0");
   const seconds = String(date.getSeconds()).padStart(2, "0");
+  const miliSeconds = String(date.getMilliseconds() * 100).padStart(8, "0");
 
-  return `${day}-${month}-${year}-${hours}:${minutes}:${seconds}`;
+  return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}.${miliSeconds}+06`;
 }
