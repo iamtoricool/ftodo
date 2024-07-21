@@ -23,7 +23,7 @@ export const user = pgTable(
   {
     id: uuid("id").primaryKey().defaultRandom().unique(),
     firstName: varchar("first_name", { length: 255 }).notNull(),
-    lastName: varchar("last_name", { length: 255 }).notNull(),
+    lastName: varchar("last_name", { length: 255 }),
     email: varchar("email", { length: 255 }).notNull().unique(),
     membership: userMembershipEnum("membership").default("FREE"),
     createdAt: timestamp("created_at", { mode: "string" }).defaultNow(),
