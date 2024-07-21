@@ -114,6 +114,37 @@ todoRoute.put(
   }
 );
 
+todoRoute.delete("/:id{[0-9]+}", async (ctx) => {
+  const userId = ctx.get("jwtPayload")["id"];
+  const todoId = Number.parseInt(ctx.req.param()["id"]);
+
+  const todo = (
+    await dbClient
+      .delete(todoTable)
+      .where(and(eq(todoTable.userId, userId), eq(todoTable.id, todoId)))
+      .returning()
+  )[0];
+
+  if (!todo) {
+    return ctx.json(
+      responseWithData<null>({
+        error: true,
+        message: `No todo found within id: ${todoId}`,
+        data: null,
+      }),
+      204
+    );
+  }
+
+  return ctx.json(
+    responseWithData<typeof todo>({
+      message: "Todo deleted successfully",
+      data: todo,
+    }),
+    200
+  );
+});
+
 todoRoute.delete("/", zValidator("json", multiDeleteSchema), async (ctx) => {
   return ctx.json(responseWithData<null>({ data: null }));
 });
