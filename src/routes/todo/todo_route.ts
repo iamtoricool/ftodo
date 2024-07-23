@@ -181,3 +181,32 @@ todoRoute.patch(
     );
   }
 );
+
+todoRoute.delete(
+  "/",
+  zValidator("json", multiTodoActionSchema),
+  async (ctx) => {
+    const user = ctx.get("jwtPayload") as User;
+    const ids = ctx.req.valid("json")["todoId"];
+
+    const deletedTodos = [];
+    for (let index = 0; index < ids.length; index++) {
+      const id = ids[index];
+      const updatedTodo = (
+        await dbClient
+          .delete(todoTable)
+          .where(and(eq(todoTable.userId, user.id), eq(todoTable.id, id)))
+          .returning()
+      )[0];
+      deletedTodos.push(updatedTodo);
+    }
+
+    return ctx.json(
+      responseWithData<typeof deletedTodos>({
+        message: `Selected Todos deleted successfully`,
+        data: deletedTodos,
+      }),
+      204
+    );
+  }
+);
