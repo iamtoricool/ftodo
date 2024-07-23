@@ -5,11 +5,12 @@ import {
   todo as todoTable,
   todoInsertSchema,
   type Todo,
+  type User,
 } from "../../database/schema/zod_schema";
 
 import { responseWithData } from "../../utils/base_http_response";
 import { dbClient } from "../../database/database";
-import { multiDeleteSchema } from "./_zod_shema";
+import { multiTodoStatusChanger, multiTodoActionSchema } from "./_zod_shema";
 import { and, eq } from "drizzle-orm";
 import { dbDateFormat } from "../../helpers/helpers";
 
@@ -149,6 +150,34 @@ todoRoute.delete("/:id{[0-9]+}", async (ctx) => {
   );
 });
 
-todoRoute.delete("/", zValidator("json", multiDeleteSchema), async (ctx) => {
-  return ctx.json(responseWithData<null>({ data: null }));
-});
+todoRoute.patch(
+  "/",
+  zValidator("json", multiTodoStatusChanger),
+  async (ctx) => {
+    const user = ctx.get("jwtPayload") as User;
+    const ids = ctx.req.valid("json")["todoId"];
+    const isCompleted = ctx.req.valid("json")["isCompleted"];
+
+    const updatedTodos = [];
+    for (let index = 0; index < ids.length; index++) {
+      const id = ids[index];
+      const updatedTodo = (
+        await dbClient
+          .update(todoTable)
+          .set({ isCompleted: isCompleted })
+          .where(and(eq(todoTable.userId, user.id), eq(todoTable.id, id)))
+          .returning()
+      )[0];
+      updatedTodos.push(updatedTodo);
+    }
+
+    return ctx.json(
+      responseWithData<typeof updatedTodos>({
+        message: `Selected Todos marked as ${
+          isCompleted ? "Complete" : "Incomplete"
+        }`,
+        data: updatedTodos,
+      })
+    );
+  }
+);
