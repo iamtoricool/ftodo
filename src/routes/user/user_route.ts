@@ -2,23 +2,52 @@ import { Hono } from "hono";
 import { zValidator } from "@hono/zod-validator";
 
 import { eq } from "drizzle-orm";
+import _ from "lodash";
 import postgres from "postgres";
 
 import {
   userUpdateSchema,
   user as userTable,
+  todo as todoTable,
   type User,
 } from "../../database/schema/zod_schema";
 import { dbClient } from "../../database/database";
 import { responseWithData } from "../../utils/base_http_response";
-import { z } from "zod";
 import { dbDateFormat } from "../../helpers/helpers";
 
 export const userRoute = new Hono();
 
 userRoute.get("/", async (ctx) => {
   const user: User = ctx.get("jwtPayload");
-  return ctx.json(responseWithData<User>({ data: user }));
+
+  const queryData = await dbClient
+    .select()
+    .from(todoTable)
+    .where(eq(todoTable.userId, user.id));
+
+  const overviewData = {
+    createdTodo: 0,
+    completeTodo: 0,
+    incompleteTodo: 0,
+  };
+
+  _.forEach(queryData, (data) => {
+    overviewData.createdTodo += 1;
+    if (data.isCompleted) {
+      overviewData.completeTodo += 1;
+    } else {
+      overviewData.incompleteTodo += 1;
+    }
+  });
+
+  const responseData = {
+    user: _.omit(user, ["updatedAt", "createdAt"]),
+    overview: overviewData,
+  };
+
+  return ctx.json(
+    responseWithData<typeof responseData>({ data: responseData })
+  );
 });
 
 userRoute.put("/", zValidator("json", userUpdateSchema), async (ctx) => {
