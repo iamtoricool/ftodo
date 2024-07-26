@@ -1,23 +1,25 @@
-version: '3.9'
+version: "3.9"
 
 services:
   app:
     build: .
-    container_name: ftodo-app
+    container_name: ftodo-rest-server
     ports:
       - "3000:3000"
     depends_on:
       - postgresdb
     environment:
-      DATABASE_URL: "postgres://user:password@postgresdb:5432/ftodo"
+      DATABASE_URL: ${DATABASE_URL}
+      JWT_SECRET: ${JWT_SECRET}
+      JWT_TOKEN_PREFIX: ${JWT_TOKEN_PREFIX}
 
   postgresdb:
     image: postgres:alpine
     container_name: ftodo-postgres
     environment:
-      POSTGRES_DB: ftodo
-      POSTGRES_USER: user
-      POSTGRES_PASSWORD: password
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     ports:
       - "5432:5432"
     volumes:
