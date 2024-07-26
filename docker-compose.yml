@@ -1,0 +1,27 @@
+version: '3.9'
+
+services:
+  app:
+    build: .
+    container_name: ftodo-app
+    ports:
+      - "3000:3000"
+    depends_on:
+      - postgresdb
+    environment:
+      DATABASE_URL: "postgres://user:password@postgresdb:5432/ftodo"
+
+  postgresdb:
+    image: postgres:alpine
+    container_name: ftodo-postgres
+    environment:
+      POSTGRES_DB: ftodo
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+    ports:
+      - "5432:5432"
+    volumes:
+      - ftodo_data:/var/lib/postgresql/data
+
+volumes:
+  ftodo_data:
